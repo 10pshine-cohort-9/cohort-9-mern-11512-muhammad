@@ -19,7 +19,6 @@ export const authenticate = (req, res, next) => {
         console.error(error);
 
         return res.status(401).json({
-        "success": false,
         "message": "Invalid token"
         })
     }

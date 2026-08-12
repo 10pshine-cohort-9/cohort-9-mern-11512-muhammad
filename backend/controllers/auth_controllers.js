@@ -7,6 +7,12 @@ export const register = async (req, res) => {
 
     const { full_name, email, password  } = req.body;
 
+	if (!full_name || !email || !password) {
+	return res.status(400).json({
+		message: "All fields are required"
+	});
+	}
+
     const existing_user = await pool.query(
       "SELECT * FROM users WHERE email = $1",
       [email]
@@ -46,6 +52,12 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
     try {
 		const { email, password } = req.body;
+
+		if (!email || !password) {
+		return res.status(400).json({
+			message: "All fields are required"
+		});
+		}
 		
 		const user = await pool.query(
 			"SELECT * FROM users WHERE email = $1",

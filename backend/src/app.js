@@ -23,6 +23,13 @@ app.get("/", (req, res) => {
     });
 });
 
+app.use((err, req, res, next) => {
+    logger.error(err, "Unhandled APP ErrOR");
+    res.status(err.status || 500).json({
+        message: err.message || "Internal server error"
+    })
+})
+
 export default app;
 
 

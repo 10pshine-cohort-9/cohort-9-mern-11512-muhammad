@@ -1,6 +1,8 @@
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken";
 import pool from "../src/config/db.js"
+import logger from "../src/config/logger.js"
+
 
 export const register = async (req, res) => {
   try {
@@ -33,13 +35,14 @@ export const register = async (req, res) => {
       RETURNING id, full_name, email`,
       [full_name, email, hashed_pass]
     );
-    
+
+    logger.info("User registered successfully");
     res.status(201).json({
       message: "User registeredd SUCCESSfully",
       user: new_user.rows[0],
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error, "Error registering user");
 
     res.status(500).json({
       message: "Server Error"
@@ -94,14 +97,15 @@ export const login = async (req, res) => {
 				expiresIn: process.env.JWT_EXPIRES_IN,
 			}
 		);
-
+		
+		logger.info("User logged in successfully");
 		res.status(200).json({
 			message: "Login Successful",
 			token,
 		});
 
 	} catch (error) {
-		console.error(error);
+		logger.error(error, "Error logging in user");
 
 		res.status(500).json({
 			message: "Server Error",

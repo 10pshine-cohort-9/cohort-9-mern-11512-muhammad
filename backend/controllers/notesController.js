@@ -1,4 +1,5 @@
 import pool from "../src/config/db.js";
+import logger from "../src/config/logger.js"
 
 export const createNote = async (req, res) => {
     try {
@@ -19,7 +20,9 @@ export const createNote = async (req, res) => {
             [user_id, title, content]
 
         );
-        console.log("upladed note")
+        
+        logger.info("Note created Successfully")
+        //console.log("upladed note")
         
         res.status(201).json({
             message: "Note created successfully",
@@ -28,7 +31,7 @@ export const createNote = async (req, res) => {
 
 
     } catch(e) {
-        console.error(e);
+        logger.error(e, "Error creating note");
 
         res.status(500).json({
             message: "Server Error"
@@ -43,6 +46,8 @@ export const getNotes = async (req, res) => {
         [req.user.id]);
     res.json(notes.rows);
   } catch(e) {
+
+    logger.error(e, "Error fetching notes");
     res.status(500).json({message: "server error"})
   }
 };
@@ -57,12 +62,16 @@ export const updateNote = async (req, res) => {
     );
     
     if (updated.rows.length === 0) {
+        logger.warn({ noteId: req.params.id }, "Update failed. Note not found or unauthorized");
+
         return res.status(404).json({ message: "Note not Found or unauthorized" });
     } 
-
+    logger.info({ noteId: req.params.id }, "Note updated successfully");
     res.json(updated.rows[0]);
 
   } catch(e) {
+
+    logger.error(e, "Error updating note");
     res.status(500).json({message: "server error"})
   }
 };
@@ -74,10 +83,11 @@ export const getNote = async (req, res) => {
         if (note.rows.length === 0) {
             return res.status(404).json({ message: "Note not Found" });
         } 
-
+        
         res.json(note.rows[0]);
 
     } catch(e) {
+        logger.error(e, "Error fetching note");
         res.status(500).json({message: "server error"})
     }
 };
@@ -93,6 +103,7 @@ export const deleteNote = async (req, res) => {
         res.json({message: "Note deletedd"});
 
     } catch(e) {
+        logger.error(e, "Error deleting note");
         res.status(500).json({message: "server error"})
     }
 };

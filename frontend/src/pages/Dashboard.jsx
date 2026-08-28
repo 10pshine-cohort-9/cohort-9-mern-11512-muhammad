@@ -1,0 +1,167 @@
+import { useState, useEffect } from "react";
+import API from "../api/client";
+import Navbar from "../components/Navbar";
+import NoteCard from "../components/NoteCard";
+import NoteModal from "../components/NoteModal";
+import ConfirmModal from "../components/ConfirmModal";
+import { Plus, Search, FileText } from "lucide-react";
+
+export default function Dashboard() {
+  const [notes, setNotes] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingNote, setEditingNote] = useState(null);
+  const [isViewOnly, setIsViewOnly] = useState(false);
+  const [deletingNoteId, setDeletingNoteId] = useState(null);
+
+  const fetchNotes = async () => {
+    try {
+      setLoading(true);
+      const res = await API.get("/notes");
+      setNotes(res.data || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotes();
+  }, []);
+
+  const handleOpenCreate = () => {
+    setEditingNote(null);
+    setIsViewOnly(false);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenView = (note) => {
+    setEditingNote(note);
+    setIsViewOnly(true);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (note) => {
+    setEditingNote(note);
+    setIsViewOnly(false);
+    setIsModalOpen(true);
+  };
+
+  const handleSwitchToEdit = (note) => {
+    setIsViewOnly(false);
+    setEditingNote(note);
+  };
+
+  const handleSaveNote = async ({ title, content }) => {
+    try {
+      if (editingNote) {
+        const res = await API.put(`/notes/${editingNote.id}`, { title, content });
+        setNotes(notes.map((n) => (n.id === editingNote.id ? res.data : n)));
+      } else {
+        const res = await API.post("/notes", { title, content });
+        setNotes([res.data.note, ...notes]);
+      }
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeletePrompt = (id) => {
+    setDeletingNoteId(id);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingNoteId) return;
+    try {
+      await API.delete(`/notes/${deletingNoteId}`);
+      setNotes(notes.filter((n) => n.id !== deletingNoteId));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDeletingNoteId(null);
+    }
+  };
+
+  const filteredNotes = notes.filter((note) => {
+    const titleMatch = note.title?.toLowerCase().includes(searchQuery.toLowerCase());
+    const contentMatch = note.content?.toLowerCase().includes(searchQuery.toLowerCase());
+    return titleMatch || contentMatch;
+  });
+
+  return (
+    <div className="dashboard-layout">
+      <Navbar />
+
+      <main className="dashboard-main">
+        <div className="dashboard-toolbar">
+          <div className="search-box">
+            <Search size={16} className="search-icon" />
+            <input
+              type="text"
+              placeholder="SEARCH NOTES..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          <button onClick={handleOpenCreate} className="btn-add-note">
+            <Plus size={16} />
+            <span>NEW NOTE</span>
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="loading-state">FETCHING NOTES...</div>
+        ) : filteredNotes.length === 0 ? (
+          <div className="empty-state">
+            <FileText size={40} className="empty-icon" />
+            <h3>{searchQuery ? "NO MATCHING NOTES" : "NO NOTES FOUND"}</h3>
+            <p>
+              {searchQuery
+                ? "Try searching with a different keyword"
+                : "Create your first note to start your workspace."}
+            </p>
+            {!searchQuery && (
+              <button onClick={handleOpenCreate} className="btn-primary mt-4">
+                <Plus size={14} />
+                <span>CREATE FIRST NOTE</span>
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="notes-grid">
+            {filteredNotes.map((note) => (
+              <NoteCard
+                key={note.id}
+                note={note}
+                onView={handleOpenView}
+                onEdit={handleOpenEdit}
+                onDelete={handleDeletePrompt}
+              />
+            ))}
+          </div>
+        )}
+      </main>
+
+      <NoteModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveNote}
+        editingNote={editingNote}
+        isViewOnly={isViewOnly}
+        onSwitchToEdit={handleSwitchToEdit}
+      />
+
+      <ConfirmModal
+        isOpen={!!deletingNoteId}
+        onClose={() => setDeletingNoteId(null)}
+        onConfirm={handleConfirmDelete}
+        title="DELETE NOTE"
+        message="Are you sure you want to delete this note? This action cannot be undone."
+      />
+    </div>
+  );
+}

@@ -7,6 +7,7 @@ export default function NoteModal({ isOpen, onClose, onSave, editingNote, isView
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [error, setError] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (editingNote) {
@@ -17,12 +18,15 @@ export default function NoteModal({ isOpen, onClose, onSave, editingNote, isView
       setContent("");
     }
     setError("");
+    setIsSaving(false);
   }, [editingNote, isOpen]);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSaving) return;
+
     if (!title.trim()) {
       setError("Title is required");
       return;
@@ -31,7 +35,15 @@ export default function NoteModal({ isOpen, onClose, onSave, editingNote, isView
       setError("Content is required");
       return;
     }
-    onSave({ title, content });
+
+    try {
+      setIsSaving(true);
+      await onSave({ title, content });
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to save note");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const modules = {
@@ -84,6 +96,7 @@ export default function NoteModal({ isOpen, onClose, onSave, editingNote, isView
               onChange={(e) => setTitle(e.target.value)}
               className="title-input"
               autoFocus
+              disabled={isSaving}
             />
 
             <div className="editor-container">
@@ -93,16 +106,17 @@ export default function NoteModal({ isOpen, onClose, onSave, editingNote, isView
                 onChange={setContent}
                 modules={modules}
                 placeholder="Write your note here..."
+                readOnly={isSaving}
               />
             </div>
 
             <div className="modal-actions">
-              <button type="button" onClick={onClose} className="btn-secondary">
+              <button type="button" onClick={onClose} disabled={isSaving} className="btn-secondary">
                 Cancel
               </button>
-              <button type="submit" className="btn-primary">
+              <button type="submit" disabled={isSaving} className="btn-primary">
                 <Save size={14} />
-                <span>{editingNote ? "Save Changes" : "Create"}</span>
+                <span>{isSaving ? "Saving..." : editingNote ? "Save Changes" : "Create"}</span>
               </button>
             </div>
           </form>

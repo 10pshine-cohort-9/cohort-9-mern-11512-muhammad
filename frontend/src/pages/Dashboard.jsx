@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import NoteCard from "../components/NoteCard";
 import NoteModal from "../components/NoteModal";
 import ConfirmModal from "../components/ConfirmModal";
-import { Plus, Search, FileText } from "lucide-react";
+import { Search, FileText } from "lucide-react";
 
 export default function Dashboard() {
   const [notes, setNotes] = useState([]);
@@ -93,7 +93,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-layout">
-      <Navbar />
+      <Navbar onNewNote={handleOpenCreate} />
 
       <main className="dashboard-main">
         <div className="dashboard-toolbar">
@@ -106,11 +106,6 @@ export default function Dashboard() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-
-          <button onClick={handleOpenCreate} className="btn-add-note">
-            <Plus size={16} />
-            <span>NEW NOTE</span>
-          </button>
         </div>
 
         {loading ? (
@@ -124,12 +119,6 @@ export default function Dashboard() {
                 ? "Try searching with a different keyword"
                 : "Create your first note to start your workspace."}
             </p>
-            {!searchQuery && (
-              <button onClick={handleOpenCreate} className="btn-primary mt-4">
-                <Plus size={14} />
-                <span>CREATE FIRST NOTE</span>
-              </button>
-            )}
           </div>
         ) : (
           <div className="notes-grid">

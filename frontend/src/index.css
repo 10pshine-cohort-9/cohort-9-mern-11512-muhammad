@@ -19,7 +19,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.25rem 2.5rem;
+  padding: 1rem 2.5rem;
   background: #000000;
   border-bottom: 2px solid #222222;
   position: sticky;
@@ -36,19 +36,57 @@ body {
   text-transform: uppercase;
 }
 .red-dot { width: 9px; height: 9px; background: #eb0029; display: inline-block; }
-.nav-user { display: flex; align-items: center; gap: 1rem; }
-.user-tag {
+
+/* Pixel-perfect Navbar Alignment */
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.user-tag, .btn-logout, .btn-add-note {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 0.85rem;
   font-family: ui-monospace, monospace;
   font-size: 0.75rem;
-  color: #888888;
-  background: #0a0a0a;
-  padding: 0.4rem 0.8rem;
   border: 1px solid #222222;
   text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.user-tag {
+  color: #888888;
+  background: #0a0a0a;
+}
+.btn-add-note {
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #ffffff;
+  font-weight: 800;
+  cursor: pointer;
+  gap: 0.4rem;
+  transition: all 0.15s ease;
+}
+.btn-add-note:hover {
+  background: transparent;
+  color: #ffffff;
+}
+.btn-logout {
+  background: transparent;
+  color: #888888;
+  cursor: pointer;
+  gap: 0.4rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+.btn-logout:hover {
+  color: #eb0029;
+  border-color: #eb0029;
+  background: #140305;
 }
 
 .dashboard-main { max-width: 1300px; margin: 0 auto; padding: 2.5rem; }
-.dashboard-toolbar { display: flex; justify-content: space-between; gap: 1.5rem; margin-bottom: 2.5rem; }
+.dashboard-toolbar { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 2.5rem; }
 
 /* Inputs & Search */
 .search-box, .input-group {
@@ -59,7 +97,7 @@ body {
   border: 1px solid #222222;
   padding: 0.75rem 1.25rem;
 }
-.search-box { flex: 1; max-width: 500px; }
+.search-box { flex: 1; max-width: 600px; }
 .input-group { background: #000000; }
 .input-group:focus-within, .search-box:focus-within { border-color: #ffffff; }
 input { background: transparent; border: none; outline: none; color: #ffffff; width: 100%; font-size: 0.9rem; font-family: inherit; }
@@ -68,7 +106,7 @@ input::placeholder { color: #666666; text-transform: uppercase; font-size: 0.8re
 
 /* Swiss High-Contrast Buttons */
 button { cursor: pointer; border: 1px solid #222222; font-family: inherit; }
-.btn-primary, .btn-add-note, .btn-auth {
+.btn-primary, .btn-auth {
   background: #ffffff;
   color: #000000;
   border: 1px solid #ffffff;
@@ -82,8 +120,9 @@ button { cursor: pointer; border: 1px solid #222222; font-family: inherit; }
   gap: 0.5rem;
   transition: all 0.15s ease;
 }
-.btn-primary:hover, .btn-add-note:hover, .btn-auth:hover:not(:disabled) { background: transparent; color: #ffffff; }
-.btn-secondary, .btn-logout {
+.btn-primary:hover:not(:disabled), .btn-auth:hover:not(:disabled) { background: transparent; color: #ffffff; }
+.btn-primary:disabled, .btn-auth:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-secondary {
   background: transparent;
   color: #888888;
   padding: 0.5rem 1rem;
@@ -92,10 +131,10 @@ button { cursor: pointer; border: 1px solid #222222; font-family: inherit; }
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
-.btn-secondary:hover { color: #ffffff; border-color: #ffffff; }
-.btn-logout:hover { color: #eb0029; border-color: #eb0029; background: #140305; }
+.btn-secondary:hover:not(:disabled) { color: #ffffff; border-color: #ffffff; }
+.btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }
+
 .btn-auth { width: 100%; justify-content: center; margin-top: 0.75rem; padding: 0.85rem; }
-.btn-auth:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* Notes Swiss Grid */
 .notes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem; }

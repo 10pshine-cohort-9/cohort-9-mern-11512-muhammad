@@ -1,8 +1,10 @@
 import { useAuth } from "../context/AuthContext";
-import { LogOut } from "lucide-react";
+import { LogOut, Plus } from "lucide-react";
 
-export default function Navbar() {
+export default function Navbar({ onNewNote }) {
   const { user, logout } = useAuth();
+
+  const displayName = user?.full_name || user?.name || (user?.email ? user.email.split("@")[0] : "User");
 
   return (
     <nav className="navbar">
@@ -12,7 +14,13 @@ export default function Navbar() {
       </div>
 
       <div className="nav-user">
-        <span className="user-tag">{user?.email || "User"}</span>
+        {onNewNote && (
+          <button onClick={onNewNote} className="btn-add-note">
+            <Plus size={15} />
+            <span>NEW NOTE</span>
+          </button>
+        )}
+        <span className="user-tag">{displayName}</span>
         <button onClick={logout} className="btn-logout">
           <LogOut size={14} />
           <span>Logout</span>

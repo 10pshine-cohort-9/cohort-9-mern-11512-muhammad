@@ -53,7 +53,6 @@ export default function NoteCard({ note, onView, onEdit, onDelete }) {
 
       <div className="note-card-footer">
         <span>{formatDate(note.updated_at || note.created_at)}</span>
-        <span>ID: {note.id ? note.id.substring(0, 8) : ""}</span>
       </div>
     </div>
   );

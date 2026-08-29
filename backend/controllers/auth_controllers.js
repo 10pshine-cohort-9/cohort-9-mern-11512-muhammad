@@ -1,19 +1,17 @@
-import bcrypt from "bcrypt"
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import pool from "../src/config/db.js"
-import logger from "../src/config/logger.js"
-
+import pool from "../src/config/db.js";
+import logger from "../src/config/logger.js";
 
 export const register = async (req, res) => {
   try {
+    const { full_name, email, password } = req.body;
 
-    const { full_name, email, password  } = req.body;
-
-	if (!full_name || !email || !password) {
-	return res.status(400).json({
-		message: "All fields are required"
-	});
-	}
+    if (!full_name || !email || !password) {
+      return res.status(400).json({
+        message: "All fields are required"
+      });
+    }
 
     const existing_user = await pool.query(
       "SELECT * FROM users WHERE email = $1",
@@ -26,90 +24,88 @@ export const register = async (req, res) => {
       });
     }
 
+    const hashed_pass = await bcrypt.hash(password, 10);
 
-    const hashed_pass = await bcrypt.hash(password , 10);
-    
     const new_user = await pool.query(
-      `INSERT INTO users (full_name, email, password )
-      VALUEs ($1, $2, $3)
+      `INSERT INTO users (full_name, email, password)
+      VALUES ($1, $2, $3)
       RETURNING id, full_name, email`,
       [full_name, email, hashed_pass]
     );
 
     logger.info("User registered successfully");
     res.status(201).json({
-      message: "User registeredd SUCCESSfully",
-      user: new_user.rows[0],
+      message: "User registered successfully",
+      user: new_user.rows[0]
     });
   } catch (error) {
     logger.error(error, "Error registering user");
-
     res.status(500).json({
       message: "Server Error"
     });
   }
-
-
 };
 
 export const login = async (req, res) => {
-    try {
-		const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-		if (!email || !password) {
-		return res.status(400).json({
-			message: "All fields are required"
-		});
-		}
-		
-		const user = await pool.query(
-			"SELECT * FROM users WHERE email = $1",
-			[email]
-		);
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "All fields are required"
+      });
+    }
 
-		if (user.rows.length === 0) {
-			return res.status(401).json({
-				message: "Invalid email or password",
-			});
-		}
-		
-		const existing_user = user.rows[0];
+    const user = await pool.query(
+      "SELECT * FROM users WHERE email = $1",
+      [email]
+    );
 
-		const Match = await bcrypt.compare(
-			password ,
-			existing_user.password
-		);
+    if (user.rows.length === 0) {
+      return res.status(401).json({
+        message: "Invalid email or password"
+      });
+    }
 
-		if (!Match) {
-			return res.status(401).json({
+    const existing_user = user.rows[0];
 
-				message: "Invalid Emaill or PAssword",
-			});
-		}
-	
-		const token = jwt.sign(
-			{
-				id: existing_user.id,
-				email: existing_user.email,
-			},
-			process.env.JWT_SECRET,
-			{
-				expiresIn: process.env.JWT_EXPIRES_IN,
-			}
-		);
-		
-		logger.info("User logged in successfully");
-		res.status(200).json({
-			message: "Login Successful",
-			token,
-		});
+    const match = await bcrypt.compare(
+      password,
+      existing_user.password
+    );
 
-	} catch (error) {
-		logger.error(error, "Error logging in user");
+    if (!match) {
+      return res.status(401).json({
+        message: "Invalid email or password"
+      });
+    }
 
-		res.status(500).json({
-			message: "Server Error",
-		});
-	}
+    const token = jwt.sign(
+      {
+        id: existing_user.id,
+        email: existing_user.email,
+        full_name: existing_user.full_name
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: process.env.JWT_EXPIRES_IN
+      }
+    );
 
-}
+    logger.info("User logged in successfully");
+    res.status(200).json({
+      message: "Login Successful",
+      token,
+      user: {
+        id: existing_user.id,
+        full_name: existing_user.full_name,
+        email: existing_user.email
+      }
+    });
+  } catch (error) {
+    logger.error(error, "Error logging in user");
+    res.status(500).json({
+      message: "Server Error"
+    });
+  }
+};

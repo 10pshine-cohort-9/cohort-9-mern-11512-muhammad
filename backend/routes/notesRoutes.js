@@ -1,6 +1,4 @@
 import express from "express";
-import logger from "../src/config/logger.js"
-
 
 import {
   createNote,

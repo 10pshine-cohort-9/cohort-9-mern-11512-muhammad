@@ -46,6 +46,20 @@ export default function NoteModal({ isOpen, onClose, onSave, editingNote, isView
     }
   };
 
+  let modalTitle = "New Note";
+  if (isViewOnly) {
+    modalTitle = "View Note";
+  } else if (editingNote) {
+    modalTitle = "Edit Note";
+  }
+
+  let submitLabel = "Create";
+  if (isSaving) {
+    submitLabel = "Saving...";
+  } else if (editingNote) {
+    submitLabel = "Save Changes";
+  }
+
   const modules = {
     toolbar: [
       [{ header: [1, 2, false] }],
@@ -55,11 +69,29 @@ export default function NoteModal({ isOpen, onClose, onSave, editingNote, isView
   };
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="modal-backdrop"
+      onClick={onClose}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") onClose();
+      }}
+      role="presentation"
+    >
+      <div
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="note-modal-heading"
+      >
         <div className="modal-header">
-          <h2>{isViewOnly ? "View Note" : editingNote ? "Edit Note" : "New Note"}</h2>
-          <button onClick={onClose} className="btn-close">
+          <h2 id="note-modal-heading">{modalTitle}</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn-close"
+            aria-label="Close"
+          >
             <X size={18} />
           </button>
         </div>
@@ -116,7 +148,7 @@ export default function NoteModal({ isOpen, onClose, onSave, editingNote, isView
               </button>
               <button type="submit" disabled={isSaving} className="btn-primary">
                 <Save size={14} />
-                <span>{isSaving ? "Saving..." : editingNote ? "Save Changes" : "Create"}</span>
+                <span>{submitLabel}</span>
               </button>
             </div>
           </form>

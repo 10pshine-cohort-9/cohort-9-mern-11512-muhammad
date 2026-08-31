@@ -55,18 +55,14 @@ export default function Dashboard() {
   };
 
   const handleSaveNote = async ({ title, content }) => {
-    try {
-      if (editingNote) {
-        const res = await API.put(`/notes/${editingNote.id}`, { title, content });
-        setNotes(notes.map((n) => (n.id === editingNote.id ? res.data : n)));
-      } else {
-        const res = await API.post("/notes", { title, content });
-        setNotes([res.data.note, ...notes]);
-      }
-      setIsModalOpen(false);
-    } catch (err) {
-      console.error(err);
+    if (editingNote) {
+      const res = await API.put(`/notes/${editingNote.id}`, { title, content });
+      setNotes(notes.map((n) => (n.id === editingNote.id ? res.data : n)));
+    } else {
+      const res = await API.post("/notes", { title, content });
+      setNotes([res.data.note, ...notes]);
     }
+    setIsModalOpen(false);
   };
 
   const handleDeletePrompt = (id) => {
@@ -91,6 +87,11 @@ export default function Dashboard() {
     return titleMatch || contentMatch;
   });
 
+  const emptyHeading = searchQuery ? "NO MATCHING NOTES" : "NO NOTES FOUND";
+  const emptyDescription = searchQuery
+    ? "Try searching with a different keyword"
+    : "Create your first note to start your workspace.";
+
   return (
     <div className="dashboard-layout">
       <Navbar onNewNote={handleOpenCreate} />
@@ -113,12 +114,8 @@ export default function Dashboard() {
         ) : filteredNotes.length === 0 ? (
           <div className="empty-state">
             <FileText size={40} className="empty-icon" />
-            <h3>{searchQuery ? "NO MATCHING NOTES" : "NO NOTES FOUND"}</h3>
-            <p>
-              {searchQuery
-                ? "Try searching with a different keyword"
-                : "Create your first note to start your workspace."}
-            </p>
+            <h3>{emptyHeading}</h3>
+            <p>{emptyDescription}</p>
           </div>
         ) : (
           <div className="notes-grid">

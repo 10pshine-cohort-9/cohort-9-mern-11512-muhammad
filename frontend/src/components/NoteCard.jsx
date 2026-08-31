@@ -17,29 +17,47 @@ export default function NoteCard({ note, onView, onEdit, onDelete }) {
     return div.textContent || div.innerText || "";
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onView(note);
+    }
+  };
+
   return (
-    <div className="note-card" onClick={() => onView(note)}>
+    <div
+      className="note-card"
+      onClick={() => onView(note)}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-label={`View note: ${note.title}`}
+    >
       <div>
         <div className="note-card-header">
           <h3 className="note-title">{note.title}</h3>
           <div className="note-actions">
             <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit(note);
               }}
               className="icon-btn edit-btn"
               title="Edit Note"
+              aria-label="Edit Note"
             >
               <Edit3 size={15} />
             </button>
             <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onDelete(note.id);
               }}
               className="icon-btn delete-btn"
               title="Delete Note"
+              aria-label="Delete Note"
             >
               <Trash2 size={15} />
             </button>

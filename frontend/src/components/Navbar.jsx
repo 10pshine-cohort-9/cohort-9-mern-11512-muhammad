@@ -15,13 +15,13 @@ export default function Navbar({ onNewNote }) {
 
       <div className="nav-user">
         {onNewNote && (
-          <button onClick={onNewNote} className="btn-add-note">
+          <button type="button" onClick={onNewNote} className="btn-add-note">
             <Plus size={15} />
             <span>NEW NOTE</span>
           </button>
         )}
         <span className="user-tag">{displayName}</span>
-        <button onClick={logout} className="btn-logout">
+        <button type="button" onClick={logout} className="btn-logout">
           <LogOut size={14} />
           <span>Logout</span>
         </button>

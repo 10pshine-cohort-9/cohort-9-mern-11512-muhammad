@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useMemo } from "react";
 import API from "../api/client";
 
 const AuthContext = createContext();
@@ -65,8 +65,17 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const contextValue = useMemo(() => ({
+    token,
+    user,
+    login,
+    register,
+    logout,
+    isAuthenticated: !!token
+  }), [token, user]);
+
   return (
-    <AuthContext.Provider value={{ token, user, login, register, logout, isAuthenticated: !!token }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

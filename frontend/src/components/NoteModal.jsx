@@ -69,21 +69,14 @@ export default function NoteModal({ isOpen, onClose, onSave, editingNote, isView
   };
 
   return (
-    <div
-      className="modal-backdrop"
-      onClick={onClose}
-      onKeyDown={(e) => {
-        if (e.key === "Escape") onClose();
-      }}
-      role="presentation"
-    >
-      <div
-        className="modal-content"
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="note-modal-heading"
-      >
+    <dialog open className="modal-dialog-root" aria-labelledby="note-modal-heading">
+      <button
+        type="button"
+        className="modal-backdrop-btn"
+        onClick={onClose}
+        aria-label="Close background overlay"
+      />
+      <div className="modal-content">
         <div className="modal-header">
           <h2 id="note-modal-heading">{modalTitle}</h2>
           <button
@@ -154,6 +147,6 @@ export default function NoteModal({ isOpen, onClose, onSave, editingNote, isView
           </form>
         )}
       </div>
-    </div>
+    </dialog>
   );
 }

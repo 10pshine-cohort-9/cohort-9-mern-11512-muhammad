@@ -4,21 +4,14 @@ export default function ConfirmModal({ isOpen, onClose, onConfirm, title, messag
   if (!isOpen) return null;
 
   return (
-    <div
-      className="modal-backdrop"
-      onClick={onClose}
-      onKeyDown={(e) => {
-        if (e.key === "Escape") onClose();
-      }}
-      role="presentation"
-    >
-      <div
-        className="confirm-modal-content"
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="confirm-modal-title"
-      >
+    <dialog open className="modal-dialog-root" aria-labelledby="confirm-modal-title">
+      <button
+        type="button"
+        className="modal-backdrop-btn"
+        onClick={onClose}
+        aria-label="Close background overlay"
+      />
+      <div className="confirm-modal-content">
         <div className="confirm-modal-header">
           <div className="confirm-title-row">
             <AlertTriangle size={18} className="confirm-icon" />
@@ -47,6 +40,6 @@ export default function ConfirmModal({ isOpen, onClose, onConfirm, title, messag
           </button>
         </div>
       </div>
-    </div>
+    </dialog>
   );
 }

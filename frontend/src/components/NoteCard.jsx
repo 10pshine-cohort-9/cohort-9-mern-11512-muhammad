@@ -17,61 +17,41 @@ export default function NoteCard({ note, onView, onEdit, onDelete }) {
     return div.textContent || div.innerText || "";
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      onView(note);
-    }
-  };
-
   return (
-    <div
-      className="note-card"
-      onClick={() => onView(note)}
-      onKeyDown={handleKeyDown}
-      role="button"
-      tabIndex={0}
-      aria-label={`View note: ${note.title}`}
-    >
-      <div>
-        <div className="note-card-header">
-          <h3 className="note-title">{note.title}</h3>
-          <div className="note-actions">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(note);
-              }}
-              className="icon-btn edit-btn"
-              title="Edit Note"
-              aria-label="Edit Note"
-            >
-              <Edit3 size={15} />
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(note.id);
-              }}
-              className="icon-btn delete-btn"
-              title="Delete Note"
-              aria-label="Delete Note"
-            >
-              <Trash2 size={15} />
-            </button>
-          </div>
+    <article className="note-card">
+      <button
+        type="button"
+        className="note-card-body-btn"
+        onClick={() => onView(note)}
+        aria-label={`View note ${note.title}`}
+      >
+        <h3 className="note-title">{note.title}</h3>
+        <p className="note-preview">{getPlainText(note.content)}</p>
+        <div className="note-card-footer">
+          <span>{formatDate(note.updated_at || note.created_at)}</span>
         </div>
+      </button>
 
-        <div className="note-preview">
-          {getPlainText(note.content)}
-        </div>
+      <div className="note-actions">
+        <button
+          type="button"
+          onClick={() => onEdit(note)}
+          className="icon-btn edit-btn"
+          title="Edit Note"
+          aria-label="Edit Note"
+        >
+          <Edit3 size={15} />
+        </button>
+        <button
+          type="button"
+          onClick={() => onDelete(note.id)}
+          className="icon-btn delete-btn"
+          title="Delete Note"
+          aria-label="Delete Note"
+        >
+          <Trash2 size={15} />
+        </button>
       </div>
-
-      <div className="note-card-footer">
-        <span>{formatDate(note.updated_at || note.created_at)}</span>
-      </div>
-    </div>
+    </article>
   );
 }

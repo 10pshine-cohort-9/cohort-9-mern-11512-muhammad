@@ -92,6 +92,33 @@ export default function Dashboard() {
     ? "Try searching with a different keyword"
     : "Create your first note to start your workspace.";
 
+  let contentArea;
+  if (loading) {
+    contentArea = <div className="loading-state">FETCHING NOTES...</div>;
+  } else if (filteredNotes.length === 0) {
+    contentArea = (
+      <div className="empty-state">
+        <FileText size={40} className="empty-icon" />
+        <h3>{emptyHeading}</h3>
+        <p>{emptyDescription}</p>
+      </div>
+    );
+  } else {
+    contentArea = (
+      <div className="notes-grid">
+        {filteredNotes.map((note) => (
+          <NoteCard
+            key={note.id}
+            note={note}
+            onView={handleOpenView}
+            onEdit={handleOpenEdit}
+            onDelete={handleDeletePrompt}
+          />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="dashboard-layout">
       <Navbar onNewNote={handleOpenCreate} />
@@ -109,27 +136,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {loading ? (
-          <div className="loading-state">FETCHING NOTES...</div>
-        ) : filteredNotes.length === 0 ? (
-          <div className="empty-state">
-            <FileText size={40} className="empty-icon" />
-            <h3>{emptyHeading}</h3>
-            <p>{emptyDescription}</p>
-          </div>
-        ) : (
-          <div className="notes-grid">
-            {filteredNotes.map((note) => (
-              <NoteCard
-                key={note.id}
-                note={note}
-                onView={handleOpenView}
-                onEdit={handleOpenEdit}
-                onDelete={handleDeletePrompt}
-              />
-            ))}
-          </div>
-        )}
+        {contentArea}
       </main>
 
       <NoteModal
